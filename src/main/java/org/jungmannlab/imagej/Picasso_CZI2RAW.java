@@ -9,10 +9,21 @@ import ij.WindowManager;
 import ij.process.*;
 import ij.gui.*;
 import ij.io.DirectoryChooser;
+import ij.io.FileSaver;
 
 import java.awt.*;
 import java.awt.image.*;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
+
 import ij.plugin.*;
+import ij.plugin.filter.Writer;
 import ij.plugin.frame.*;
 
 /**
@@ -34,6 +45,7 @@ public class Picasso_CZI2RAW implements PlugIn {
 		private int width;
 		private int height;
 		private int frames;
+		private int channels;
 
 		// plugin parameters
 		public double value;
@@ -41,7 +53,8 @@ public class Picasso_CZI2RAW implements PlugIn {
 		
 
 		public void run(String arg) {
-			IJ.showMessage("dfd");
+			
+			
 			ImagePlus ip=WindowManager.getCurrentImage();
 			//check if file is loaded
 			if(ip==null){
@@ -75,30 +88,64 @@ public class Picasso_CZI2RAW implements PlugIn {
 		            }
 				}
 			}
+		
+				
+			channels = ip.getNChannels();
+			width = ip.getWidth();
+			height = ip.getHeight();
+			frames = ip.getNFrames();
 			
-			//check if stack
-			if(1==ip.getStackSize()){
-				IJ.showMessage("jo");
-				width = ip.getWidth();
-				height = ip.getHeight();
-				frames = ip.getNFrames();
+			System.out.println("width: " + Integer.toString(width));
+			System.out.println("height: " + Integer.toString(height));
+			System.out.println("channels: " + Integer.toString(channels));
+			System.out.println("frames: " + Integer.toString(frames));
+			
+			
+			
+			for(int k=1; k<=channels; k++){
+				ImageStack stackCh = new ImageStack(width, height);
+				stackCh = ChannelSplitter.getChannel(ip,k);
+				String ipTitleCh = null;
+				ipTitleCh = ipTitle+"_Ch"+Integer.toString(k);
+				System.out.println(ipTitleCh);
 				
-				ImageStack stackCh1 = new ImageStack(width, height);
-				ImageStack stackCh2 = new ImageStack(width, height);
+				ImagePlus imageCh = new ImagePlus(ipTitleCh,stackCh);
+				imageCh.show();
+				saveImageStack(imageCh,path+System.getProperty("file.separator")+ipTitleCh);
 				
+				Map<String, Object> data = new HashMap<String, Object>();
+				data.put("Byte Order", ">");
+				data.put("Data Type", "uint16");
+				data.put("Frames",frames);
+				data.put("Height",height);
+				data.put("Width",width);
 				
-				stackCh1 = ChannelSplitter.getChannel(ip,1);
-				stackCh2 = ChannelSplitter.getChannel(ip,2);
+				DumperOptions options = new DumperOptions();
+				options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+				Yaml yaml = new Yaml(options);
 				
-				ImagePlus imageCh1 = new ImagePlus(ipTitle+"_Ch1",stackCh1);
-				imageCh1.show();
+					
+				FileWriter writer = null;
+				try {
+					writer = new FileWriter(path+ipTitleCh+".yaml");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			    yaml.dump(data, writer);
 				
 			}
-			else{
-				IJ.showMessage("No Stack loaded");
-			}
+				
 		}	
 
+		private void saveImageStack(ImagePlus im, String path){ 
+			
+			FileSaver saver = new FileSaver(im); 
+			if(path!=null){
+				saver.saveAsRawStack(path+".raw"); 
+			}
+		}
 
 	/**
 	 * Main method for debugging.
@@ -120,8 +167,8 @@ public class Picasso_CZI2RAW implements PlugIn {
 		
 		
 		// open the sample image
-//		ImagePlus image = IJ.openImage("/Users/Alex/Desktop/2nM_p1_atto647n_561_50%.tif");
-		ImagePlus image = IJ.createImage("test", 360, 360, 6, 16);
+		ImagePlus image = IJ.openImage("/Users/Alex/1/2nM_p1_atto647n_561_50%.tif");
+//		ImagePlus image = IJ.createImage("test", 360, 360, 6, 16);
 		image.show();
 		// run the plugin
 		IJ.runPlugIn(clazz.getName(), "");
