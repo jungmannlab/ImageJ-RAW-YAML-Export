@@ -27,15 +27,14 @@ import ij.plugin.filter.Writer;
 import ij.plugin.frame.*;
 
 /**
-
-This plugin is developed for quadview images or imagestacks, where four different color channels ar recordet on a single camera chip.
-The image gets quartered into four individual images or stacks with same size. Color channel info is appended to the filename. The color model stays the same.
-
-Images needs to be square sized!
+This plugin helps to convert .czi (Zeiss file format) files to .raw with the addition of an YAML file for Picasso processing.
+The .czi files need to be loaded with "Bioformats".
+Besides, the plugin can be used for every other loaded stack.
+Multi-channel files will be saved as ongoing files _Ch{i}
 
 @author Auer Alexander <aauer@biochem.mpg.de>
 
-created 150701
+created 170713
 */
 
 public class Picasso_CZI2RAW implements PlugIn {
@@ -95,23 +94,14 @@ public class Picasso_CZI2RAW implements PlugIn {
 			height = ip.getHeight();
 			frames = ip.getNFrames();
 			
-			System.out.println("width: " + Integer.toString(width));
-			System.out.println("height: " + Integer.toString(height));
-			System.out.println("channels: " + Integer.toString(channels));
-			System.out.println("frames: " + Integer.toString(frames));
+//			System.out.println("width: " + Integer.toString(width));
+//			System.out.println("height: " + Integer.toString(height));
+//			System.out.println("channels: " + Integer.toString(channels));
+//			System.out.println("frames: " + Integer.toString(frames));
 			
-			
-			
-			for(int k=1; k<=channels; k++){
-				ImageStack stackCh = new ImageStack(width, height);
-				stackCh = ChannelSplitter.getChannel(ip,k);
-				String ipTitleCh = null;
-				ipTitleCh = ipTitle+"_Ch"+Integer.toString(k);
-				System.out.println(ipTitleCh);
+			if(channels==1){
 				
-				ImagePlus imageCh = new ImagePlus(ipTitleCh,stackCh);
-				imageCh.show();
-				saveImageStack(imageCh,path+System.getProperty("file.separator")+ipTitleCh);
+				saveImageStack(ip,path+System.getProperty("file.separator")+ipTitle);
 				
 				Map<String, Object> data = new HashMap<String, Object>();
 				data.put("Byte Order", ">");
@@ -124,17 +114,52 @@ public class Picasso_CZI2RAW implements PlugIn {
 				options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 				Yaml yaml = new Yaml(options);
 				
-					
 				FileWriter writer = null;
 				try {
-					writer = new FileWriter(path+ipTitleCh+".yaml");
+					writer = new FileWriter(path+ipTitle+".yaml");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				yaml.dump(data, writer);
 				
-			    yaml.dump(data, writer);
+			}else if(channels>1){
+				//iterate through the channel stack
 				
+				for(int k=1; k<=channels; k++){
+					ImageStack stackCh = new ImageStack(width, height);
+					stackCh = ChannelSplitter.getChannel(ip,k);
+					String ipTitleCh = null;
+					ipTitleCh = ipTitle+"_Ch"+Integer.toString(k);
+					
+					ImagePlus imageCh = new ImagePlus(ipTitleCh,stackCh);
+					imageCh.show();
+					saveImageStack(imageCh,path+System.getProperty("file.separator")+ipTitleCh);
+					
+					Map<String, Object> data = new HashMap<String, Object>();
+					data.put("Byte Order", ">");
+					data.put("Data Type", "uint16");
+					data.put("Frames",frames);
+					data.put("Height",height);
+					data.put("Width",width);
+					
+					DumperOptions options = new DumperOptions();
+					options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+					Yaml yaml = new Yaml(options);
+					
+						
+					FileWriter writer = null;
+					try {
+						writer = new FileWriter(path+ipTitleCh+".yaml");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				    yaml.dump(data, writer);
+					
+				}
+			
 			}
 				
 		}	
@@ -167,9 +192,9 @@ public class Picasso_CZI2RAW implements PlugIn {
 		
 		
 		// open the sample image
-		ImagePlus image = IJ.openImage("/Users/Alex/1/2nM_p1_atto647n_561_50%.tif");
+//		ImagePlus image = IJ.openImage("/Users/Alex/1/2nM_p1_atto647n_561_50%_Ch1.raw");
 //		ImagePlus image = IJ.createImage("test", 360, 360, 6, 16);
-		image.show();
+//		image.show();
 		// run the plugin
 		IJ.runPlugIn(clazz.getName(), "");
 	}
