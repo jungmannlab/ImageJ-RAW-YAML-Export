@@ -45,6 +45,7 @@ public class Picasso_CZI2RAW implements PlugIn {
 		private int height;
 		private int frames;
 		private int channels;
+		private boolean isStack;
 
 		// plugin parameters
 		public double value;
@@ -88,11 +89,13 @@ public class Picasso_CZI2RAW implements PlugIn {
 				}
 			}
 		
-				
+			isStack=(1!=ip.getStackSize());
+			System.out.println(isStack);
 			channels = ip.getNChannels();
 			width = ip.getWidth();
 			height = ip.getHeight();
 			frames = ip.getNFrames();
+			
 			
 //			System.out.println("width: " + Integer.toString(width));
 //			System.out.println("height: " + Integer.toString(height));
@@ -101,7 +104,11 @@ public class Picasso_CZI2RAW implements PlugIn {
 			
 			if(channels==1){
 				
-				saveImageStack(ip,path+System.getProperty("file.separator")+ipTitle);
+				if(isStack){
+					saveImageStack(ip,path+System.getProperty("file.separator")+ipTitle);
+				}else{
+					saveImage(ip,path+System.getProperty("file.separator")+ipTitle);
+				}
 				
 				Map<String, Object> data = new HashMap<String, Object>();
 				data.put("Byte Order", ">");
@@ -171,6 +178,13 @@ public class Picasso_CZI2RAW implements PlugIn {
 				saver.saveAsRawStack(path+".raw"); 
 			}
 		}
+		private void saveImage(ImagePlus im, String path){
+			FileSaver saver = new FileSaver(im);
+			if(path!=null){
+				saver.saveAsRaw(path+".raw");
+			}
+			
+		}
 
 	/**
 	 * Main method for debugging.
@@ -192,9 +206,9 @@ public class Picasso_CZI2RAW implements PlugIn {
 		
 		
 		// open the sample image
-//		ImagePlus image = IJ.openImage("/Users/Alex/1/2nM_p1_atto647n_561_50%_Ch1.raw");
+		ImagePlus image = IJ.openImage("/Users/Alex/Desktop/1.png");
 //		ImagePlus image = IJ.createImage("test", 360, 360, 6, 16);
-//		image.show();
+		image.show();
 		// run the plugin
 		IJ.runPlugIn(clazz.getName(), "");
 	}
