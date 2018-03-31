@@ -27,9 +27,8 @@ import ij.plugin.filter.Writer;
 import ij.plugin.frame.*;
 
 /**
-This plugin helps to convert .czi (Zeiss file format) files to .raw with the addition of an YAML file for Picasso processing.
-The .czi files need to be loaded with "Bioformats".
-Besides, the plugin can be used for every other loaded stack.
+This plugin helps to convert image data for example .czi (Zeiss file format) files to .raw with the addition of an YAML file for Picasso processing.
+The image files need to be loaded into ImageJ.
 Multi-channel files will be saved as ongoing files _Ch{i}
 
 @author Auer Alexander <aauer@biochem.mpg.de>
@@ -37,7 +36,7 @@ Multi-channel files will be saved as ongoing files _Ch{i}
 created 170713
 */
 
-public class Picasso_CZI2RAW implements PlugIn {
+public class Raw_Yaml_export implements PlugIn {
 
 		
 		// image property members
@@ -196,9 +195,9 @@ public class Picasso_CZI2RAW implements PlugIn {
 	 */
 	public static void main(String[] args) {
 		// set the plugins.dir property to make the plugin appear in the Plugins menu
-		Class<?> clazz = Picasso_CZI2RAW.class;
-		String url = clazz.getResource("/" + clazz.getName().replace('.', '/') + ".class").toString();
-		String pluginsDir = url.substring(5, url.length() - clazz.getName().length() - 6);
+		Class<?> clazz = Raw_Yaml_export.class;
+		//String url = clazz.getResource("/" + clazz.getName().replace('.', '/') + ".class").toString();
+		// String pluginsDir = url.substring(5, url.length() - clazz.getName().length() - 6);
 		// System.setProperty("plugins.dir", pluginsDir);
 		// System.out.println(pluginsDir);
 		// start ImageJ

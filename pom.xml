@@ -13,10 +13,9 @@
 	</parent>
 	
 	<groupId>org.jungmannlab</groupId>
-	<artifactId>Picasso_CZI2RAW</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 
-	<name>plugins/Picasso_CZI2RAW.jar</name>
+	<name>plugins/Raw_Yaml_export</name>
 	<description>A Maven project implementing an ImageJ 1.x plugin</description>
 
 	<developers>
@@ -32,7 +31,7 @@
 
 	<properties>
 		<package-name>org.jungmannlab.imagej</package-name>
-		<main-class>org.jungmannlab.imagej.Picasso_CZI2RAW</main-class>
+		<main-class>org.jungmannlab.imagej.Raw_Yaml_export</main-class>
 		<license.licenseName>bsd_2</license.licenseName>
 	</properties>
 
@@ -58,4 +57,5 @@
 		</plugins>
 	</build>
 
+	<artifactId>Raw_Yaml_export</artifactId>
 </project>
