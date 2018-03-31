@@ -90,11 +90,11 @@ public class Picasso_CZI2RAW implements PlugIn {
 			}
 		
 			isStack=(1!=ip.getStackSize());
-			System.out.println(isStack);
+			// System.out.println(isStack);
 			channels = ip.getNChannels();
 			width = ip.getWidth();
 			height = ip.getHeight();
-			frames = ip.getNFrames();
+			frames = ip.getNSlices();
 			
 			
 //			System.out.println("width: " + Integer.toString(width));
@@ -199,16 +199,16 @@ public class Picasso_CZI2RAW implements PlugIn {
 		Class<?> clazz = Picasso_CZI2RAW.class;
 		String url = clazz.getResource("/" + clazz.getName().replace('.', '/') + ".class").toString();
 		String pluginsDir = url.substring(5, url.length() - clazz.getName().length() - 6);
-		System.setProperty("plugins.dir", pluginsDir);
-		System.out.println(pluginsDir);
+		// System.setProperty("plugins.dir", pluginsDir);
+		// System.out.println(pluginsDir);
 		// start ImageJ
 		new ImageJ();
 		
 		
 		// open the sample image
-		ImagePlus image = IJ.openImage("/Users/Alex/Desktop/1.png");
+		// ImagePlus image = IJ.openImage("/Users/Alex/Desktop/1.png");
 //		ImagePlus image = IJ.createImage("test", 360, 360, 6, 16);
-		image.show();
+		// image.show();
 		// run the plugin
 		IJ.runPlugIn(clazz.getName(), "");
 	}
