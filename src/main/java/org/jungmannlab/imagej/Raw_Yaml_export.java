@@ -175,15 +175,15 @@ public class Raw_Yaml_export implements PlugIn {
 		System.setProperty("plugins.dir", pluginsDir);
 		// System.out.println(pluginsDir);
 		// start ImageJ
-		new ImageJ();
+		//new ImageJ();
 		
 		
 		// open the sample image
 //		 ImagePlus image = IJ.openImage("/Users/Alex/Desktop/1.png");
-		ImagePlus image = IJ.createImage("test", 360, 360, 6, 16);
-		image.show();
+		//ImagePlus image = IJ.createImage("test", 360, 360, 6, 16);
+		//image.show();
 		// run the plugin
-		IJ.runPlugIn(clazz.getName(), "");
+		//IJ.runPlugIn(clazz.getName(), "");
 	}
 
 	
